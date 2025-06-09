@@ -1,5 +1,5 @@
 import Cart from "../models/cart.model";
-import Product from "../models/product.model"; // if you need to fetch product price
+import Product from "../models/product.model";
 import mongoose from "mongoose";
 
 export const addToCart = async (req: any, res: any) => {
@@ -10,35 +10,42 @@ export const addToCart = async (req: any, res: any) => {
     return res.status(400).json({ message: "No products provided" });
   }
 
-  const { product: productId, quantity, price } = products[0];
-
   try {
     let cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
-      cart = new Cart({
-        user: userId,
-        products: [{ product: productId, quantity, price }],
-      });
-    } else {
-      const existingProduct = cart.products.find((p: any) =>
-        p.product.toString() === productId
+      // If cart doesn't exist, create a new one
+      cart = new Cart({ user: userId, products: [] });
+    }
+
+    for (const item of products) {
+      const { product: productId, quantity, price } = item;
+
+      const existingProductIndex = cart.products.findIndex(
+        (p: any) => p.product.toString() === productId
       );
 
-      if (existingProduct) {
-        existingProduct.quantity += quantity;
+      if (existingProductIndex !== -1) {
+        // Update quantity if product already in cart
+        cart.products[existingProductIndex].quantity += quantity;
       } else {
+        // Add new product to cart
         cart.products.push({ product: productId, quantity, price });
       }
     }
 
+    // Recalculate cartTotal
     cart.cartTotal = cart.products.reduce(
       (sum: number, item: any) => sum + item.price * item.quantity,
       0
     );
 
     await cart.save();
-    res.status(200).json({ message: "Product added to cart", cart });
+
+    // Fetch the updated cart with populated product details
+    const populatedCart = await Cart.findById(cart._id).populate("products.product");
+
+    res.status(200).json({ message: "Cart updated", cart: populatedCart });
   } catch (err: any) {
     res.status(500).json({ message: "Error adding to cart", error: err.message });
   }
