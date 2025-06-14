@@ -28,7 +28,7 @@ exports.signup = signup;
 const signin = async (req, res) => {
     const { email, password, isAdmin } = req.body;
     try {
-        const existingUser = await user_model_js_1.default.findOne({ email, password });
+        const existingUser = await user_model_js_1.default.findOne({ email, password, isAdmin });
         if (existingUser) {
             const token = jsonwebtoken_1.default.sign({
                 id: existingUser._id,

@@ -2,7 +2,7 @@ import Product from "../models/product.model.js";
 import { Request, Response } from "express";
 
 export const createProduct = async (req: Request, res: Response) => {
-  const { title, description, price, discountedPrice, stock } = req.body;
+  const { title, description, image, price, discountedPrice, stock } = req.body;
   //@ts-ignore
   const userId = req.userId;
   console.log(userId);
@@ -11,6 +11,7 @@ export const createProduct = async (req: Request, res: Response) => {
     const product = await Product.create({
       title,
       description,
+      image,
       price,
       discountedPrice,
       createdBy: userId,
@@ -20,6 +21,18 @@ export const createProduct = async (req: Request, res: Response) => {
     res.status(201).json({ message: "Product created successfully", product });
   } catch (e: any) {
     res.status(500).json({ message: `Some error occurred: ${e.message}` });
+  }
+};
+
+export const getCreatedProduct = async (req: Request, res: Response) => {
+  //@ts-ignore
+  const userId = req.userId;
+  try {
+    const products = await Product.find({ createdBy: userId });
+    res.status(200).json({ products });
+  } catch (e: any) {
+    console.error("Error fetching products:", e);
+    res.status(500).json({ message: `An error occurred: ${e.message}` });
   }
 };
 
@@ -34,13 +47,13 @@ export const getProduct = async (req: Request, res: Response) => {
 };
 
 export const updateProduct = async (req: Request, res: Response) => {
-  const { title, description, price, discountedPrice, stock } = req.body;
+  const { title, description, image, price, discountedPrice, stock } = req.body;
   const { productId } = req.params;
 
   try {
     const result = await Product.updateOne(
       { _id: productId },
-      { $set: { title, description, price, discountedPrice, stock } }
+      { $set: { title, description, image, price, discountedPrice, stock } }
     );
 
     if (result.matchedCount === 0) {

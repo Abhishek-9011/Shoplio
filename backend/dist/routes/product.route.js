@@ -7,7 +7,8 @@ const express_1 = __importDefault(require("express"));
 const product_controller_1 = require("../controllers/product.controller");
 const adminMiddleware_1 = require("../middleware/adminMiddleware");
 const router = express_1.default.Router();
-router.get("/products", adminMiddleware_1.adminMiddleware, product_controller_1.getProduct);
+router.get("/products", product_controller_1.getProduct);
+router.get("/createdProducts", adminMiddleware_1.adminMiddleware, product_controller_1.getCreatedProduct);
 router.post("/products", adminMiddleware_1.adminMiddleware, product_controller_1.createProduct);
 // @ts-ignore
 router.put("/products/:productId", adminMiddleware_1.adminMiddleware, product_controller_1.updateProduct);

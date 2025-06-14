@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProduct = exports.updateProduct = exports.getProduct = exports.createProduct = void 0;
+exports.deleteProduct = exports.updateProduct = exports.getProduct = exports.getCreatedProduct = exports.createProduct = void 0;
 const product_model_js_1 = __importDefault(require("../models/product.model.js"));
 const createProduct = async (req, res) => {
-    const { title, description, price, discountedPrice, stock } = req.body;
+    const { title, description, image, price, discountedPrice, stock } = req.body;
     //@ts-ignore
     const userId = req.userId;
     console.log(userId);
@@ -14,6 +14,7 @@ const createProduct = async (req, res) => {
         const product = await product_model_js_1.default.create({
             title,
             description,
+            image,
             price,
             discountedPrice,
             createdBy: userId,
@@ -26,6 +27,19 @@ const createProduct = async (req, res) => {
     }
 };
 exports.createProduct = createProduct;
+const getCreatedProduct = async (req, res) => {
+    //@ts-ignore
+    const userId = req.userId;
+    try {
+        const products = await product_model_js_1.default.find({ createdBy: userId });
+        res.status(200).json({ products });
+    }
+    catch (e) {
+        console.error("Error fetching products:", e);
+        res.status(500).json({ message: `An error occurred: ${e.message}` });
+    }
+};
+exports.getCreatedProduct = getCreatedProduct;
 const getProduct = async (req, res) => {
     try {
         const products = await product_model_js_1.default.find({});
@@ -38,10 +52,10 @@ const getProduct = async (req, res) => {
 };
 exports.getProduct = getProduct;
 const updateProduct = async (req, res) => {
-    const { title, description, price, discountedPrice, stock } = req.body;
+    const { title, description, image, price, discountedPrice, stock } = req.body;
     const { productId } = req.params;
     try {
-        const result = await product_model_js_1.default.updateOne({ _id: productId }, { $set: { title, description, price, discountedPrice, stock } });
+        const result = await product_model_js_1.default.updateOne({ _id: productId }, { $set: { title, description, image, price, discountedPrice, stock } });
         if (result.matchedCount === 0) {
             return res.status(404).json({ message: "Product not found" });
         }

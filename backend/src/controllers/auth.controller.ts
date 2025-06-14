@@ -21,7 +21,7 @@ export const signup = async (req: any, res: any) => {
 export const signin = async (req: any, res: any) => {
   const { email, password, isAdmin } = req.body;
   try {
-    const existingUser = await User.findOne({ email, password });
+    const existingUser = await User.findOne({ email, password, isAdmin });
     if (existingUser) {
       const token = jwt.sign(
         {
