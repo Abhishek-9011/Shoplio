@@ -21,7 +21,7 @@ const Products = () => {
   }, []);
 
   return (
-    <div >
+    <div>
       {products.map(
         ({
           _id,
@@ -35,6 +35,7 @@ const Products = () => {
         }) => (
           <Card
             key={_id}
+            _id={_id}
             title={title}
             description={description}
             image={image}

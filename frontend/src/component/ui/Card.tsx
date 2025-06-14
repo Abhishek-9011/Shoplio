@@ -1,5 +1,7 @@
+import axios from "axios";
 import { Button } from "./Button";
 interface CardProps {
+  _id?: string;
   title: string;
   description: string;
   image: string;
@@ -10,11 +12,43 @@ interface CardProps {
 }
 
 export const Card = (props: CardProps) => {
-  const { title, description, image, price, discountedPrice, stock, rating } =
-    props;
+  const {
+    _id,
+    title,
+    description,
+    image,
+    price,
+    discountedPrice,
+    stock,
+    rating,
+  } = props;
 
   const isOutOfStock = stock <= 0;
-
+  const addTocart = async (_id: any, price: any) => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/cart`,
+        {
+          products: [
+            {
+              product: _id,
+              quantity: 1,
+              price: price,
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      alert("Added to cart");
+      console.log("successfully added to cart");
+    } catch (e) {
+      console.log("some error ocurred" + e);
+    }
+  };
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition p-4 max-w-xl w-full flex gap-4">
       {/* Image section */}
@@ -63,7 +97,12 @@ export const Card = (props: CardProps) => {
             size="md"
             text={isOutOfStock ? "Unavailable" : "Add to Cart"}
             disabled={isOutOfStock}
-            onClick={() => console.log("Added to cart:", title)}
+            //@ts-ignore
+            onClick={() => {
+              if (!isOutOfStock) {
+                addTocart(_id, discountedPrice || price);
+              }
+            }}
           />
         </div>
       </div>

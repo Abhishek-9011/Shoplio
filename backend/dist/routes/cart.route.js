@@ -8,4 +8,7 @@ const cart_controller_1 = require("../controllers/cart.controller");
 const userMiddleware_1 = require("../middleware/userMiddleware");
 const router = express_1.default.Router();
 router.post("/cart", userMiddleware_1.userMiddleware, cart_controller_1.addToCart);
+router.get("/cart", userMiddleware_1.userMiddleware, cart_controller_1.getCart);
+router.patch("/cart/:productId", userMiddleware_1.userMiddleware, cart_controller_1.updateCartItem);
+router.delete("/cart/:productId", userMiddleware_1.userMiddleware, cart_controller_1.removeFromCart);
 exports.default = router;

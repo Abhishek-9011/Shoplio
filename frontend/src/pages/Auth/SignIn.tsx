@@ -3,6 +3,7 @@ import { Input } from "../../component/ui/Input";
 import { Button } from "../../component/ui/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignIn = () => {
 const navigate = useNavigate();
@@ -30,7 +31,7 @@ try {
 
     const jwt = response.data.token;
     localStorage.setItem("token", jwt);
-    alert("You are signed In");
+    toast("You are signed In");
     navigate("/");
 } catch (e) {
     alert("some error occured signing In");

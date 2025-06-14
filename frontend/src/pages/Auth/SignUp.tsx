@@ -3,6 +3,7 @@ import { Input } from "../../component/ui/Input";
 import { Button } from "../../component/ui/Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const SignUp = () => {
     });
 
     navigate("/signin");
-    alert("You have signed Up");}
+    toast("You have signed Up");}
     catch (e){
         alert("Some error occured during sign up")
     }
