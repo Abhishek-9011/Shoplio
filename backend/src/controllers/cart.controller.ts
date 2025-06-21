@@ -99,7 +99,7 @@ export const getCart = async (req: any, res: any) => {
           ...item.product,
           // Add any additional transformations here
           //@ts-ignore
-          finalPrice: item.product.discountedPrice || item.product.price,
+        zfinalPrice: item.product.discountedPrice ?? item.product.price
         },
       })),
     };

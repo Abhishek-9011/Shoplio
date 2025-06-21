@@ -9,6 +9,9 @@ import {
   Tooltip,
   Legend,
   ArcElement,
+  Chart,
+  type ChartType,
+  DoughnutController,
 } from "chart.js";
 import { Line, Pie } from "react-chartjs-2";        
 import { Link } from "react-router-dom";
@@ -22,8 +25,6 @@ import {
   Users,
   TrendingUp,
 } from "lucide-react";
-// import Sidebar from "../Sidebar";
-
 // Register Chart.js components
 ChartJS.register(
   CategoryScale,
@@ -33,8 +34,33 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  DoughnutController
 );
+
+type SaleReportProps = {
+  description: string;
+  amount: string | number;
+  percent: number;
+  icon: React.ReactNode;
+  color: 'indigo' | 'blue' | 'emerald' | 'rose';
+};
+
+type OrderLocationProps = {
+  location: string;
+  orders: number;
+  color: string;
+};
+
+type Product = {
+  id: number;
+  name: string;
+  image: string;
+  price: number;
+  category: string;
+  quantity: number;
+  amount: number;
+};
 
 function AdminDashboard() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -50,9 +76,6 @@ function AdminDashboard() {
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-50">
-      {/* Sidebar - will be hidden on mobile by default */}
-      {/* {!isMobile && <Sidebar />} */}
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Dashboard Content */}
@@ -167,15 +190,15 @@ function AdminDashboard() {
 }
 
 const MonthlyTarget = () => {
-  const chartRef = useRef(null);
-  const chartInstance = useRef(null);
+  const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstance = useRef<Chart<"doughnut", number[], unknown> | null>(null);
   const percentage = 75.34;
   const todayEarnings = 3267;
   const target = 25000;
   const revenue = 18000;
   const today = 1800;
 
-  const formatCurrency = (num) => {
+  const formatCurrency = (num: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(num);
   };
 
@@ -188,39 +211,40 @@ const MonthlyTarget = () => {
     // Create new chart
     if (chartRef.current) {
       const ctx = chartRef.current.getContext('2d');
-      
-      chartInstance.current = new ChartJS(ctx, {
-        type: 'doughnut',
-        data: {
-          datasets: [{
-            data: [percentage, 100 - percentage],
-            backgroundColor: ['#6366F1', '#E5E7EB'],
-            borderWidth: 0,
-            borderRadius: 5,
-            circumference: 360,
-            cutout: '80%'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          rotation: -90,
-          plugins: {
-            tooltip: {
-              enabled: false
-            }
+      if (ctx) {
+        chartInstance.current = new ChartJS(ctx, {
+          type: 'doughnut',
+          data: {
+            datasets: [{
+              data: [percentage, 100 - percentage],
+              backgroundColor: ['#6366F1', '#E5E7EB'],
+              borderWidth: 0,
+              borderRadius: 5,
+              circumference: 360,
+              cutout: '80%'
+            }]
           },
-          animation: {
-            animateRotate: true,
-            animateScale: false
-          },
-          elements: {
-            arc: {
-              roundedCornersFor: 0
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            rotation: -90,
+            plugins: {
+              tooltip: {
+                enabled: false
+              }
+            },
+            animation: {
+              animateRotate: true,
+              animateScale: false
+            },
+            elements: {
+              arc: {
+                roundedCornersFor: 0
+              }
             }
           }
-        }
-      });
+        });
+      }
     }
     
     // Clean up chart instance on component unmount
@@ -281,7 +305,7 @@ const MonthlyTarget = () => {
 };
 
 const TopSellingProducts = () => {
-  const products = [
+  const products: Product[] = [
     {
       id: 1,
       name: "Casual Shirt",
@@ -422,7 +446,7 @@ const PieChart = () => {
     plugins: {
       tooltip: {
         callbacks: {
-          label: (tooltipItem) => {
+          label: (tooltipItem: any) => {
             return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
           },
         },
@@ -521,7 +545,7 @@ const Graph = () => {
         cornerRadius: 4,
         displayColors: false,
         callbacks: {
-          label: function(context) {
+          label: function(context: any) {
             return `$${context.raw.toLocaleString()}`;
           }
         }
@@ -550,7 +574,7 @@ const Graph = () => {
           font: {
             size: 11,
           },
-          callback: function(value) {
+          callback: function(value: any) {
             return '$' + value.toLocaleString();
           }
         },
@@ -562,7 +586,7 @@ const Graph = () => {
   return <Line data={data} options={options} />;
 };
 
-function OrderLocation({ location, orders, color }) {
+const OrderLocation: React.FC<OrderLocationProps> = ({ location, orders, color }) => {
   const percentage = Math.min(Math.floor(orders / 2), 100);
 
   return (
@@ -579,9 +603,9 @@ function OrderLocation({ location, orders, color }) {
       </div>
     </div>
   );
-}
+};
 
-const SaleReport = ({ description, amount, percent, icon, color }) => {
+const SaleReport: React.FC<SaleReportProps> = ({ description, amount, percent, icon, color }) => {
   const isPositive = percent >= 0;
   const amountFormatted = typeof amount === 'number' ? amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : amount;
   

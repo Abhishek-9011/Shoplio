@@ -9,6 +9,8 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const userMiddleware = (req, res, next) => {
     const token = req.headers["authorization"];
+    console.log(token);
+    console.log(process.env.JWT_PASSWORD);
     // @ts-ignore
     const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_PASSWORD);
     if (decoded) {

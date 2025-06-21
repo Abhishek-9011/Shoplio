@@ -11,6 +11,7 @@ interface ButtonProps {
   loadingText?: string;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
+  className?:string
 }
 
 const variantStyles = {
@@ -38,12 +39,13 @@ export const Button = ({
   loadingText,
   type = "button",
   disabled = false,
+  className:string,
 }: ButtonProps) => {
   return (
     <button
       onClick={onClick}
       type={type}
-      className={clsx(defaultStyles, variantStyles[variant], sizeStyles[size], {
+      className={    clsx(defaultStyles, variantStyles[variant], sizeStyles[size], { 
         "opacity-50 cursor-not-allowed": loading || disabled,
       })}
       disabled={loading || disabled}

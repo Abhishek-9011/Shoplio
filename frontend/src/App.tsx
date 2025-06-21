@@ -6,20 +6,40 @@ import SignIn from "./pages/Auth/SignIn";
 import Product from "./pages/Products";
 import CreatedProducts from "./pages/Seller/CreatedProducts";
 import CartPage from "./pages/CartPage";
+import HomePage from "./pages/Home";
+import Navbar from "./component/ui/Navbar";
+import AdminDashboard from "./pages/Seller/Dashboard";
+import CartContextProvider from "./context/CartContextProvider";
+import UserContextProvider from "./context/UserContextProvider";
+import ProductContextProvider from "./context/ProductContextProvider";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path={"/product"} element={<Product />}></Route>
-          <Route path={"/signup"} element={<SignUp />} />
-          <Route path={"/signin"} element={<SignIn />} />
-          <Route path={"/cart"} element={<CartPage />} />
-          <Route path={"/createProduct"} element={<CreateProductForm />} />
-          <Route path={"/createdProduct"} element={<CreatedProducts />} />
-        </Routes>
-      </BrowserRouter>
+      <ProductContextProvider>
+        <UserContextProvider>
+          <CartContextProvider>
+            <BrowserRouter>
+              <Navbar />
+              <Routes>
+                <Route path={"/products"} element={<Product />}></Route>
+                <Route path={"/signup"} element={<SignUp />} />
+                <Route path={"/dashboard"} element={<AdminDashboard />} />
+                <Route path={"/"} element={<HomePage />} />
+                <Route path={"/signin"} element={<SignIn />} />
+                <Route path={"/cart"} element={<CartPage />} />
+                <Route path={"/profile"} element={<Profile />} />
+                <Route
+                  path={"/createProduct"}
+                  element={<CreateProductForm />}
+                />
+                <Route path={"/createdProduct"} element={<CreatedProducts />} />
+              </Routes>
+            </BrowserRouter>
+          </CartContextProvider>
+        </UserContextProvider>
+      </ProductContextProvider>
     </>
   );
 }

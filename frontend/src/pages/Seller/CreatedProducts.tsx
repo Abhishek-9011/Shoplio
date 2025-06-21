@@ -1,10 +1,11 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Card } from "../../component/ui/Card";
 import { SellerCard } from "../../component/ui/SellerCard";
+import ProductContext from "../../context/ProductContext";
 
 const CreatedProducts = () => {
-  let [products, setProducts] = useState([]);
+  const {products, setProducts} = useContext(ProductContext);
   useEffect(() => {
     const getProducts = async () => {
       try {

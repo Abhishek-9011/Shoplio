@@ -87,7 +87,7 @@ const getCart = async (req, res) => {
                     ...item.product,
                     // Add any additional transformations here
                     //@ts-ignore
-                    finalPrice: item.product.discountedPrice || item.product.price,
+                    zfinalPrice: item.product.discountedPrice ?? item.product.price
                 },
             })),
         };
@@ -112,7 +112,7 @@ const updateCartItem = async (req, res) => {
     if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
         return res.status(400).json({ message: "Invalid product ID" });
     }
-    if (typeof quantity !== 'number' || quantity < 1) {
+    if (typeof quantity !== "number" || quantity < 1) {
         return res.status(400).json({ message: "Quantity must be at least 1" });
     }
     try {
@@ -124,13 +124,11 @@ const updateCartItem = async (req, res) => {
         // Check stock availability
         if (quantity > product.stock) {
             return res.status(400).json({
-                message: `Only ${product.stock} items available in stock`
+                message: `Only ${product.stock} items available in stock`,
             });
         }
         // Find and update cart
         const cart = await cart_model_1.default.findOne({ user: userId });
-        console.log(userId);
-        console.log(cart);
         if (!cart) {
             return res.status(404).json({ message: "Cart not found" });
         }
@@ -141,24 +139,23 @@ const updateCartItem = async (req, res) => {
         // Update quantity
         cart.products[itemIndex].quantity = quantity;
         // Recalculate total
-        cart.cartTotal = cart.products.reduce((total, item) => total + (item.price * item.quantity), 0);
+        cart.cartTotal = cart.products.reduce((total, item) => total + item.price * item.quantity, 0);
         const updatedCart = await cart.save();
         // Return populated cart
-        const populatedCart = await cart_model_1.default.findById(updatedCart._id)
-            .populate({
-            path: 'products.product',
-            select: 'title description image price discountedPrice stock rating'
+        const populatedCart = await cart_model_1.default.findById(updatedCart._id).populate({
+            path: "products.product",
+            select: "title description image price discountedPrice stock rating",
         });
         return res.status(200).json({
             message: "Cart item updated",
-            cart: populatedCart
+            cart: populatedCart,
         });
     }
     catch (err) {
         console.error("Update cart error:", err);
         return res.status(500).json({
             message: "Error updating cart item",
-            error: err instanceof Error ? err.message : "Unknown error"
+            error: err instanceof Error ? err.message : "Unknown error",
         });
     }
 };
@@ -182,18 +179,17 @@ const removeFromCart = async (req, res) => {
             return res.status(404).json({ message: "Item not found in cart" });
         }
         // Recalculate total
-        cart.cartTotal = cart.products.reduce((total, item) => total + (item.price * item.quantity), 0);
+        cart.cartTotal = cart.products.reduce((total, item) => total + item.price * item.quantity, 0);
         const updatedCart = await cart.save();
         // Return populated cart if items remain, else return empty cart
         if (updatedCart.products.length > 0) {
-            const populatedCart = await cart_model_1.default.findById(updatedCart._id)
-                .populate({
-                path: 'products.product',
-                select: 'title description  image price discountedPrice stock rating'
+            const populatedCart = await cart_model_1.default.findById(updatedCart._id).populate({
+                path: "products.product",
+                select: "title description  image price discountedPrice stock rating",
             });
             return res.status(200).json({
                 message: "Item removed from cart",
-                cart: populatedCart
+                cart: populatedCart,
             });
         }
         return res.status(200).json({
@@ -202,15 +198,15 @@ const removeFromCart = async (req, res) => {
                 products: [],
                 cartTotal: 0,
                 user: userId,
-                _id: updatedCart._id
-            }
+                _id: updatedCart._id,
+            },
         });
     }
     catch (err) {
         console.error("Remove from cart error:", err);
         return res.status(500).json({
             message: "Error removing item from cart",
-            error: err instanceof Error ? err.message : "Unknown error"
+            error: err instanceof Error ? err.message : "Unknown error",
         });
     }
 };
